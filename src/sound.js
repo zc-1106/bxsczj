@@ -2,6 +2,8 @@
  * Web Audio API 轻量音效合成 — 无外部音频文件依赖
  *
  * 所有函数内部已做 try-catch 防护，AudioContext 不可用时静默降级。
+ * 正常模式（data-theme="normal"）：低沉的木质敲击声
+ * 简洁模式（data-theme="simple"）：清脆的叮声
  */
 
 // ─── 共享 AudioContext（懒初始化）─────────────────────────────
@@ -16,6 +18,16 @@ function getCtx() {
     return ctx
   } catch {
     return null
+  }
+}
+
+// ─── 主题检测 ──────────────────────────────────────────────
+
+function getTheme() {
+  try {
+    return document.documentElement.getAttribute('data-theme') || 'normal'
+  } catch {
+    return 'normal'
   }
 }
 
@@ -73,8 +85,9 @@ function createTone(freq, type = 'sine') {
  * @param {string} type    - 波形
  * @param {number} [lfoFreq]  - 可选颤音调制频率
  * @param {number} [lfoDepth] - 可选颤音调制深度
+ * @param {number} [gainPeak] - 最大增益（默认 0.3）
  */
-function playTone({ freq, dur, when = 0, type = 'sine', lfoFreq, lfoDepth }) {
+function playTone({ freq, dur, when = 0, type = 'sine', lfoFreq, lfoDepth, gainPeak = 0.3 }) {
   try {
     const t = createTone(freq, type)
     if (!t) return
@@ -99,9 +112,9 @@ function playTone({ freq, dur, when = 0, type = 'sine', lfoFreq, lfoDepth }) {
 
     // ADSR 简化：快速 attack + 短 sustain + 快 release
     gain.gain.setValueAtTime(0, startTime)
-    gain.gain.linearRampToValueAtTime(0.3, startTime + 0.005)   // attack
-    gain.gain.setValueAtTime(0.25, startTime + dur * 0.7)       // sustain
-    gain.gain.linearRampToValueAtTime(0, startTime + dur)        // release
+    gain.gain.linearRampToValueAtTime(gainPeak, startTime + 0.005)   // attack
+    gain.gain.setValueAtTime(gainPeak * 0.8, startTime + dur * 0.7)  // sustain
+    gain.gain.linearRampToValueAtTime(0, startTime + dur)             // release
 
     osc.start(startTime)
     osc.stop(startTime + dur)
@@ -119,50 +132,197 @@ function playTone({ freq, dur, when = 0, type = 'sine', lfoFreq, lfoDepth }) {
 // ─── 公开 API ──────────────────────────────────────────────
 
 /**
- * 短促清脆的"滴"声 — 正弦波 800Hz，持续 0.1s
+ * 点击音效
+ * 正常模式：极轻的“嗒”声（400Hz，0.04s）
+ * 简洁模式：短促清脆的"滴"声（800Hz，0.1s）
  */
 export function playClick() {
   try {
     if (isMuted()) return
-    playTone({ freq: 800, dur: 0.1 })
+    const theme = getTheme()
+    if (theme === 'normal') {
+      // 木质嗒声 — 低频率、极短
+      playTone({ freq: 400, dur: 0.04, type: 'triangle', gainPeak: 0.2 })
+    } else {
+      playTone({ freq: 800, dur: 0.1 })
+    }
   } catch { /* noop */ }
 }
 
 /**
- * 上升音阶 — 两个连续正弦波 600→900Hz，各 0.1s
+ * 成功音效
+ * 正常模式：两个低音木质音符（350Hz + 500Hz）
+ * 简洁模式：上升音阶 600→900Hz
  */
 export function playSuccess() {
   try {
     if (isMuted()) return
-    playTone({ freq: 600, dur: 0.1, when: 0 })
-    playTone({ freq: 900, dur: 0.1, when: 0.12 })
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({ freq: 350, dur: 0.1, when: 0, type: 'triangle', gainPeak: 0.25 })
+      playTone({ freq: 500, dur: 0.12, when: 0.12, type: 'triangle', gainPeak: 0.25 })
+    } else {
+      playTone({ freq: 600, dur: 0.1, when: 0 })
+      playTone({ freq: 900, dur: 0.1, when: 0.12 })
+    }
   } catch { /* noop */ }
 }
 
 /**
- * 成就三连音"叮叮叮" — 800/1000/1200Hz，像烤箱提示
+ * 成就音效
+ * 正常模式：三个低音木质音符（300/400/500Hz）
+ * 简洁模式：成就三连音"叮叮叮"
  */
 export function playAchievement() {
   try {
     if (isMuted()) return
-    playTone({ freq: 800,  dur: 0.12, when: 0 })
-    playTone({ freq: 1000, dur: 0.12, when: 0.16 })
-    playTone({ freq: 1200, dur: 0.18, when: 0.32 })
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({ freq: 300, dur: 0.12, when: 0, type: 'triangle', gainPeak: 0.22 })
+      playTone({ freq: 400, dur: 0.12, when: 0.16, type: 'triangle', gainPeak: 0.22 })
+      playTone({ freq: 500, dur: 0.15, when: 0.32, type: 'triangle', gainPeak: 0.22 })
+    } else {
+      playTone({ freq: 800,  dur: 0.12, when: 0 })
+      playTone({ freq: 1000, dur: 0.12, when: 0.16 })
+      playTone({ freq: 1200, dur: 0.18, when: 0.32 })
+    }
   } catch { /* noop */ }
 }
 
 /**
- * 低沉嗡嗡声 — 200Hz，0.2s，轻微颤音
+ * 错误音效
+ * 正常模式：更低沉嗡嗡声 — 150Hz，0.2s
+ * 简洁模式：低沉嗡嗡声 — 200Hz，0.2s
  */
 export function playError() {
   try {
     if (isMuted()) return
-    playTone({
-      freq: 200,
-      dur: 0.2,
-      type: 'triangle',
-      lfoFreq: 10,   // 每秒 10 次颤音
-      lfoDepth: 8,   // ±8Hz 偏移
-    })
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({
+        freq: 150,
+        dur: 0.2,
+        type: 'triangle',
+        lfoFreq: 8,
+        lfoDepth: 6,
+        gainPeak: 0.22,
+      })
+    } else {
+      playTone({
+        freq: 200,
+        dur: 0.2,
+        type: 'triangle',
+        lfoFreq: 10,
+        lfoDepth: 8,
+      })
+    }
+  } catch { /* noop */ }
+}
+
+// ─── 拍照快门音效 ────────────────────────────────────────────
+
+/**
+ * 快门声
+ * 正常模式：老式机械相机声（白噪声 0.2s，更长）
+ * 简洁模式：短白噪声突发 0.08s
+ */
+export function playShutter() {
+  try {
+    if (isMuted()) return
+    const c = getCtx()
+    if (!c) return
+
+    const theme = getTheme()
+    const duration = theme === 'normal' ? 0.2 : 0.08
+    const sampleRate = c.sampleRate
+    const bufferSize = Math.floor(sampleRate * duration)
+    const buffer = c.createBuffer(1, bufferSize, sampleRate)
+    const data = buffer.getChannelData(0)
+
+    // 白噪声 + 指数衰减
+    for (let i = 0; i < bufferSize; i++) {
+      const t = i / sampleRate
+      const decayFactor = theme === 'normal' ? 0.35 : 0.25
+      const envelope = Math.exp(-t / (duration * decayFactor))
+      data[i] = (Math.random() * 2 - 1) * envelope * 0.6
+    }
+
+    const source = c.createBufferSource()
+    source.buffer = buffer
+    const gain = c.createGain()
+    gain.gain.value = theme === 'normal' ? 0.15 : 0.18
+    source.connect(gain)
+    gain.connect(c.destination)
+
+    // 高频增强 — 更像真实快门
+    const filter = c.createBiquadFilter()
+    filter.type = 'highshelf'
+    filter.frequency.value = 4000
+    filter.gain.value = theme === 'normal' ? 4 : 6
+    gain.connect(filter)
+    filter.connect(c.destination)
+
+    source.start()
+
+    source.onended = () => {
+      try { source.disconnect() } catch { /* noop */ }
+      try { gain.disconnect() } catch { /* noop */ }
+      try { filter.disconnect() } catch { /* noop */ }
+    }
+  } catch { /* 静默降级 */ }
+}
+
+// ─── 语音录制音效 ────────────────────────────────────────────
+
+/**
+ * 录音开始音效
+ * 正常模式：400Hz 木质嗒声，0.05s
+ * 简洁模式：400Hz 正弦波，0.08s
+ */
+export function playRecordStart() {
+  try {
+    if (isMuted()) return
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({ freq: 400, dur: 0.05, type: 'triangle', gainPeak: 0.2 })
+    } else {
+      playTone({ freq: 400, dur: 0.08 })
+    }
+  } catch { /* noop */ }
+}
+
+/**
+ * 识别成功音效
+ * 正常模式：低沉温润上扬音（350Hz→500Hz）
+ * 简洁模式：温润上扬音 500Hz→700Hz
+ */
+export function playRecordSuccess() {
+  try {
+    if (isMuted()) return
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({ freq: 350, dur: 0.1, when: 0, type: 'triangle', gainPeak: 0.22 })
+      playTone({ freq: 500, dur: 0.1, when: 0.08, type: 'triangle', gainPeak: 0.22 })
+    } else {
+      playTone({ freq: 500, dur: 0.1, when: 0 })
+      playTone({ freq: 700, dur: 0.1, when: 0.08 })
+    }
+  } catch { /* noop */ }
+}
+
+/**
+ * 识别失败音效
+ * 正常模式：更低沉的短音 150Hz 三角波
+ * 简洁模式：低沉短音 180Hz 三角波
+ */
+export function playRecordError() {
+  try {
+    if (isMuted()) return
+    const theme = getTheme()
+    if (theme === 'normal') {
+      playTone({ freq: 150, dur: 0.15, type: 'triangle', gainPeak: 0.2 })
+    } else {
+      playTone({ freq: 180, dur: 0.15, type: 'triangle' })
+    }
   } catch { /* noop */ }
 }
