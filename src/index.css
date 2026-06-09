@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* ─── 字体 & 基础 ─────────────────────────────────────────── */
+
+* {
+  font-family: 'Nunito', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+html {
+  background-color: #faf8f5;
+}
+
+body {
+  background-color: #faf8f5;
+  margin: 0;
+}
+
+/* ─── Tailwind 自定义动画主题 ──────────────────────────────── */
+
+@theme {
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-pop: pop 0.3s ease-out;
+  --animate-spatula: spatula-shake 1.2s ease-in-out infinite;
+  --animate-bubble: bubble-bounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-ingredient-1: ingredient-bounce 0.6s ease-in-out infinite;
+  --animate-ingredient-2: ingredient-bounce 0.6s ease-in-out 0.15s infinite;
+  --animate-ingredient-3: ingredient-bounce 0.6s ease-in-out 0.3s infinite;
+  --animate-lift: lift 0.25s ease-out;
+  --animate-unfold: unfold 0.3s ease-out;
+  --animate-cursor-blink: cursor-blink 1s ease-in-out infinite;
+  --animate-dash-rotate: dash-rotate 4s linear infinite;
+  --animate-rotate-out: rotate-out 0.25s ease-in;
+  --animate-slide-down: slide-down 0.3s ease-out;
+}
+
+/* ─── 漂浮动画 ─────────────────────────────────────────────── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ─── 锅铲摇晃 ─────────────────────────────────────────────── */
+
+@keyframes spatula-shake {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(-12deg); }
+  20% { transform: rotate(10deg); }
+  30% { transform: rotate(-8deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(0deg); }
+}
+
+/* ─── 弹入 ──────────────────────────────────────────────────── */
+
+@keyframes pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── 旧 wiggle（保留兼容） ────────────────────────────────── */
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+/* ─── 气泡弹跳 spring-like ─────────────────────────────────── */
+
+@keyframes bubble-bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1.05); }
+}
+
+/* ─── 食材弹跳（加载动画） ─────────────────────────────────── */
+
+@keyframes ingredient-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-12px) scale(1.1); }
+  50% { transform: translateY(0) scale(0.95); }
+  70% { transform: translateY(-6px) scale(1.05); }
+}
+
+/* ─── hover 微浮 ───────────────────────────────────────────── */
+
+@keyframes lift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+/* ─── 便签纸翻开 ───────────────────────────────────────────── */
+
+@keyframes unfold {
+  0% { opacity: 0; transform: rotateX(-8deg) translateY(-8px); }
+  100% { opacity: 1; transform: rotateX(0) translateY(0); }
+}
+
+/* ─── 打字机光标闪烁 ───────────────────────────────────────── */
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ─── 虚线圈旋转（装饰） ───────────────────────────────────── */
+
+@keyframes dash-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ─── 删除标签旋转 ─────────────────────────────────────────── */
+
+@keyframes rotate-out {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: rotate(90deg) scale(0.5); opacity: 0; }
+}
+
+/* ─── 面板下滑展开 ─────────────────────────────────────────── */
+
+@keyframes slide-down {
+  0% { max-height: 0; opacity: 0; transform: translateY(-6px); }
+  100% { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
