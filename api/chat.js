@@ -1,29 +1,54 @@
 /**
- * Vercel Serverless Function — DeepSeek Chat API 流式代理
+ * Vercel Edge Function — DeepSeek Chat API 流式代理
  *
  * 前端调用：POST /api/chat  { messages, model, temperature, max_tokens, ... }
  * 服务端读取 Vercel 环境变量 DEEPSEEK_API_KEY 并转发流式 SSE 响应给前端
  *
- * 注意：此文件仅在 Vercel 部署环境生效，本地开发由 vite.config.js 中的 proxy 处理
+ * 使用 Edge Runtime（30s 超时，支持原生流式），适合 AI 长时生成场景
+ * 本地开发由 vite.config.js 中的 proxy 处理
  */
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge',
+}
+
+export default async function handler(request) {
   // ── 仅允许 POST ──────────────────────────────────────────
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+  if (request.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   // ── 服务端读取 API Key，浏览器永远看不到 ──────────────────
   const apiKey = process.env.DEEPSEEK_API_KEY
   if (!apiKey) {
     console.error('[chat] DEEPSEEK_API_KEY 未在 Vercel 环境变量中配置')
-    return res.status(500).json({ error: 'DEEPSEEK_API_KEY not set' })
+    return new Response(JSON.stringify({ error: 'DEEPSEEK_API_KEY not set' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
-  const { model = 'deepseek-chat', messages, temperature, max_tokens } = req.body || {}
+  // ── 解析请求体 ───────────────────────────────────────────
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const { model = 'deepseek-chat', messages, temperature, max_tokens } = body
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return res.status(400).json({ error: 'Missing or invalid messages' })
+    return new Response(JSON.stringify({ error: 'Missing or invalid messages' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   try {
@@ -45,41 +70,30 @@ export default async function handler(req, res) {
     if (!deepseekRes.ok) {
       const errText = await deepseekRes.text().catch(() => '')
       console.error(`[chat] DeepSeek API 错误 ${deepseekRes.status}: ${errText}`)
-      return res.status(deepseekRes.status).json({
-        error: `DeepSeek API 请求失败 (${deepseekRes.status})`,
-      })
+      return new Response(
+        JSON.stringify({ error: `DeepSeek API 请求失败 (${deepseekRes.status})` }),
+        {
+          status: deepseekRes.status,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
-    // ── 流式转发 ──────────────────────────────────────────
-    res.setHeader('Content-Type', 'text/event-stream')
-    res.setHeader('Cache-Control', 'no-cache')
-    res.setHeader('Connection', 'keep-alive')
-    res.setHeader('X-Accel-Buffering', 'no') // 禁用 Nginx 缓冲
-
-    const reader = deepseekRes.body.getReader()
-    const decoder = new TextDecoder()
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        res.write(decoder.decode(value, { stream: true }))
-      }
-    } finally {
-      reader.releaseLock()
-    }
-
-    res.end()
+    // ── 流式转发：直接将 DeepSeek 的响应体管道给客户端 ──
+    return new Response(deepseekRes.body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    })
   } catch (err) {
     console.error('[chat] 请求异常:', err.message)
-
-    // 如果还没发送响应头，返回 JSON 错误
-    if (!res.headersSent) {
-      return res.status(500).json({ error: err.message || 'Internal server error' })
-    }
-    // 如果已经开始流式传输，只能结束连接
-    if (!res.writableEnded) {
-      res.end()
-    }
+    return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }
