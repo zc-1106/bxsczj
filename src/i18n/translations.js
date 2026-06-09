@@ -93,7 +93,7 @@ const zh = {
   'error.empty': '请至少输入一种食材',
   'error.emptyRecipes': 'AI 返回了空食谱，试试换一批食材',
   'error.gotIt': '知道啦',
-  'error.apiKey': '请先配置视觉 API Key（编辑 .env 文件，添加 VITE_VISION_API_KEY）',
+  'error.apiKey': '视觉识别服务未配置，请联系管理员设置 OPENAI_API_KEY',
 
   // ── 食谱卡片 ──────────────────────
   'recipe.count': n => `${n} 个食谱新鲜出炉`,
@@ -153,7 +153,7 @@ const zh = {
   'camera.cancelRecognize': '取消识别',
   'camera.resultFeedback': '已识别并添加到输入框',
   'camera.retryHint': '未识别到食材，请重试',
-  'camera.apiKeyHint': '请在 .env 中配置 VITE_VISION_API_KEY',
+  'camera.apiKeyHint': '视觉识别服务暂不可用，请稍后重试',
 
   'voice.holdHint': '按住录音，松手识别',
   'voice.listeningHint': '录音中，松手停止',
@@ -238,7 +238,7 @@ const en = {
   'error.empty': 'Please enter at least one ingredient',
   'error.emptyRecipes': 'AI returned empty recipes, try different ingredients',
   'error.gotIt': 'Got it',
-  'error.apiKey': 'Please configure VITE_VISION_API_KEY in .env file',
+  'error.apiKey': 'Visual recognition service not configured, please contact admin to set OPENAI_API_KEY',
 
   'recipe.count': n => `${n} recipes fresh out of the kitchen!`,
   'recipe.label': 'Recipe',
@@ -291,7 +291,7 @@ const en = {
   'camera.cancelRecognize': 'Cancel',
   'camera.resultFeedback': 'Recognized and added to input',
   'camera.retryHint': 'Recognition failed, please try again',
-  'camera.apiKeyHint': 'Please configure VITE_VISION_API_KEY in .env',
+  'camera.apiKeyHint': 'Visual recognition is temporarily unavailable, please try again later',
 
   'voice.holdHint': 'Hold to record, release to recognize',
   'voice.listeningHint': 'Recording... release to stop',
@@ -376,7 +376,7 @@ const ja = {
   'error.empty': '少なくとも1つの食材を入力してください',
   'error.emptyRecipes': 'AIが空のレシピを返しました。別の食材を試してください',
   'error.gotIt': '了解',
-  'error.apiKey': '.envファイルにVITE_VISION_API_KEYを設定してください',
+  'error.apiKey': '視覚認識サービスが設定されていません。管理者にOPENAI_API_KEYの設定を依頼してください',
 
   'recipe.count': n => `${n}件のレシピができました！`,
   'recipe.label': 'レシピ',
@@ -429,7 +429,7 @@ const ja = {
   'camera.cancelRecognize': 'キャンセル',
   'camera.resultFeedback': '認識して入力欄に追加しました',
   'camera.retryHint': '認識に失敗しました。再試行してください',
-  'camera.apiKeyHint': '.envにVITE_VISION_API_KEYを設定してください',
+  'camera.apiKeyHint': '視覚認識サービスは一時的に利用できません。しばらくしてからもう一度お試しください',
 
   'voice.holdHint': '長押しで録音、離すと認識',
   'voice.listeningHint': '録音中... 離すと停止',

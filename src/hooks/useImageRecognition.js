@@ -1,7 +1,10 @@
 import { useState, useRef, useCallback } from 'react'
 
 /**
- * 图片食材识别 Hook — 封装图片编码 + 视觉 AI API 调用
+ * 图片食材识别 Hook — 封装图片编码 + /api/vision 调用
+ *
+ * 本地开发：Vite 中间件模拟 Serverless 函数
+ * 生产环境：Vercel Serverless 函数（api/vision.js）
  *
  * @returns {{
  *   isSupported: boolean,
@@ -40,52 +43,19 @@ export function useImageRecognition() {
     setResult(null)
     setIsRecognizing(true)
 
-    // 检查 API Key
-    const apiKey = import.meta.env.VITE_VISION_API_KEY
-    if (!apiKey) {
-      setError('no-api-key')
-      setIsRecognizing(false)
-      return null
-    }
-
     try {
       // 编码图片
       const base64 = await fileToBase64(imageFile)
-
-      // 准备请求
-      const apiBase = import.meta.env.VITE_VISION_API_BASE || 'https://api.openai.com'
-      const model = import.meta.env.VITE_VISION_MODEL || 'gpt-4o-mini'
 
       const controller = new AbortController()
       abortRef.current = controller
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
-      const response = await fetch(`${apiBase}/v1/chat/completions`, {
+      // 调用 /api/vision（本地 Vite 中间件 或 Vercel Serverless）
+      const response = await fetch('/api/vision', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: "列出图片中所有你能识别的食材，仅返回食材名称，用逗号分隔，不要任何解释。如果未发现食材，返回'NONE'。",
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64}`,
-                  },
-                },
-              ],
-            },
-          ],
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64 }),
         signal: controller.signal,
       })
 
@@ -93,12 +63,12 @@ export function useImageRecognition() {
       abortRef.current = null
 
       if (!response.ok) {
-        const errBody = await response.text().catch(() => '')
-        throw new Error(`API 请求失败 (${response.status}): ${errBody}`)
+        const errBody = await response.json().catch(() => ({}))
+        throw new Error(errBody.error || `请求失败 (${response.status})`)
       }
 
       const data = await response.json()
-      const content = data.choices?.[0]?.message?.content?.trim() || ''
+      const content = data.content?.trim() || ''
 
       if (!content || content.toUpperCase() === 'NONE') {
         setError('no-ingredients')
@@ -135,7 +105,7 @@ export function useImageRecognition() {
   }, [])
 
   return {
-    isSupported: true, // 纯 JS 能力，始终可用（API Key 在 recognize 中检查）
+    isSupported: true, // 由服务端 API Key 决定，前端始终可用
     isRecognizing,
     recognize,
     result,

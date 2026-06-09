@@ -637,7 +637,7 @@ function App() {
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelected} />
 
           <div className="flex justify-center mb-4">
-            <VoiceCameraModule theme={theme} voiceSupported={voiceSupported} voiceListening={voiceListening} voiceBtnError={voiceBtnError} onVoiceStart={handleVoiceStart} onVoiceStop={handleVoiceStop} cameraRecognizing={cameraRecognizing} cameraThumbnail={cameraThumbnail} cameraResultText={cameraResultText} cameraError={cameraError} onOpenCamera={openCameraCapture} onOpenFilePicker={openFilePicker} loading={loading} apiKeyConfigured={!!import.meta.env.VITE_VISION_API_KEY} />
+            <VoiceCameraModule theme={theme} voiceSupported={voiceSupported} voiceListening={voiceListening} voiceBtnError={voiceBtnError} onVoiceStart={handleVoiceStart} onVoiceStop={handleVoiceStop} cameraRecognizing={cameraRecognizing} cameraThumbnail={cameraThumbnail} cameraResultText={cameraResultText} cameraError={cameraError} onOpenCamera={openCameraCapture} onOpenFilePicker={openFilePicker} loading={loading} apiKeyConfigured={true} />
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 mb-4">
