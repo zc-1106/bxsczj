@@ -117,11 +117,11 @@ export default defineConfig(({ mode }) => {
 
     server: {
       proxy: {
-        '/api': {
+        '/api/chat': {
           target: 'https://api.deepseek.com',
           changeOrigin: true,
-          // 去掉 /api 前缀：/api/v1/chat/completions → /v1/chat/completions
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          // 精确重写：/api/chat → /v1/chat/completions
+          rewrite: () => '/v1/chat/completions',
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
               // 在服务端注入 API Key，浏览器永远看不到

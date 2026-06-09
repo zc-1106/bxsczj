@@ -79,7 +79,7 @@ export function fetchRecipes(ingredients, mode, { onChunk, preferences, language
     let fullText = ''
 
     try {
-      const response = await fetch('/api/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

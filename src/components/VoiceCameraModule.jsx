@@ -298,7 +298,7 @@ export default function VoiceCameraModule({
               }}
             />
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#5c4f3c' }}>
-              已识别食材
+              {t('camera.recognizedLabel')}
             </span>
           </div>
         </div>

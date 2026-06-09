@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 /**
  * 图片食材识别 Hook — 封装图片编码 + /api/vision 调用
@@ -20,6 +20,14 @@ export function useImageRecognition() {
   const [error, setError] = useState(null)
   const mountedRef = useRef(true)
   const abortRef = useRef(null)
+
+  // ── 组件卸载时标记，防止内存泄漏 ────────────────────────
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
 
   // ── File → base64 ──────────────────────────────────────
   const fileToBase64 = useCallback((file) => {
