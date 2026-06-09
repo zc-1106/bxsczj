@@ -9,9 +9,8 @@ import {
 import HistoryPanel from './components/HistoryPanel.jsx'
 import AchievementToast from './components/AchievementToast.jsx'
 import PantryPanel from './components/PantryPanel.jsx'
-import { playClick, playSuccess, playAchievement, playError, isMuted, toggleMute, playRecordStart, playRecordSuccess, playRecordError, playShutter } from './sound.js'
+import { playClick, playSuccess, playAchievement, playError, isMuted, toggleMute, playRecordStart, playRecordSuccess, playRecordError } from './sound.js'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition.js'
-import { useImageRecognition } from './hooks/useImageRecognition.js'
 import { loadDarkHistory, saveDarkHistory, createDarkEntry } from './darkStorage.js'
 import DarkHallOfFame from './components/DarkHallOfFame.jsx'
 import VoiceCameraModule from './components/VoiceCameraModule.jsx'
@@ -197,41 +196,6 @@ function App() {
     voiceStart()
   }
   const handleVoiceStop = () => { if (!voiceActiveRef.current) return; voiceStop() }
-
-  const {
-    isRecognizing: cameraRecognizing,
-    recognize: cameraRecognize,
-    result: cameraResult,
-    error: cameraError,
-    cancel: cameraCancel,
-  } = useImageRecognition()
-
-  const [cameraThumbnail, setCameraThumbnail] = useState(null)
-  const [cameraResultText, setCameraResultText] = useState(null)
-  const fileInputRef = useRef(null)
-  const captureInputRef = useRef(null)
-
-  const openCameraCapture = () => { captureInputRef.current?.click() }
-  const openFilePicker = () => { fileInputRef.current?.click() }
-
-  const handleImageSelected = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => setCameraThumbnail(reader.result)
-    reader.readAsDataURL(file)
-    setCameraResultText(null)
-    playShutter()
-    const content = await cameraRecognize(file)
-    if (content) {
-      playSuccess()
-      setCameraResultText(content)
-      setIngredients((prev) => {
-        const trimmed = prev.trim()
-        return trimmed ? `${trimmed}，${content}` : content
-      })
-    } else { playError() }
-  }
 
   const [themeOpen, setThemeOpen] = useState(false)
   const themePanelRef = useRef(null)
@@ -633,11 +597,8 @@ function App() {
             <input type="text" value={ingredients} onChange={(e) => setIngredients(e.target.value)} disabled={loading} placeholder={voicePlaceholder ?? t('input.placeholder')} className={`w-full rounded-2xl border-2 bg-(--theme-surface-alt) py-3 px-4 text-gray-600 font-bold text-sm placeholder:text-(--theme-text-muted) placeholder:font-semibold outline-none transition-all duration-200 ease-out focus:border-[#f4b860] focus:bg-(--theme-surface) focus:shadow-[0_0_0_4px_rgba(244,184,96,0.08)] disabled:opacity-50 disabled:cursor-not-allowed ${isNormal ? 'input-inset input-gradient-border border-(--theme-border)' : 'border-(--theme-border)'}`} />
           </div>
 
-          <input ref={captureInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageSelected} />
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelected} />
-
           <div className="flex justify-center mb-4">
-            <VoiceCameraModule theme={theme} voiceSupported={voiceSupported} voiceListening={voiceListening} voiceBtnError={voiceBtnError} onVoiceStart={handleVoiceStart} onVoiceStop={handleVoiceStop} cameraRecognizing={cameraRecognizing} cameraThumbnail={cameraThumbnail} cameraResultText={cameraResultText} cameraError={cameraError} onOpenCamera={openCameraCapture} onOpenFilePicker={openFilePicker} loading={loading} apiKeyConfigured={true} />
+            <VoiceCameraModule theme={theme} voiceSupported={voiceSupported} voiceListening={voiceListening} voiceBtnError={voiceBtnError} onVoiceStart={handleVoiceStart} onVoiceStop={handleVoiceStop} loading={loading} />
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 mb-4">

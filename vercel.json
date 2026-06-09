@@ -8,10 +8,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "functions": {
-    "api/vision.js": {
-      "maxDuration": 10
-    }
-  }
+  ]
 }

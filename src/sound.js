@@ -219,59 +219,6 @@ export function playError() {
   } catch { /* noop */ }
 }
 
-// ─── 拍照快门音效 ────────────────────────────────────────────
-
-/**
- * 快门声
- * 正常模式：老式机械相机声（白噪声 0.2s，更长）
- * 简洁模式：短白噪声突发 0.08s
- */
-export function playShutter() {
-  try {
-    if (isMuted()) return
-    const c = getCtx()
-    if (!c) return
-
-    const theme = getTheme()
-    const duration = theme === 'normal' ? 0.2 : 0.08
-    const sampleRate = c.sampleRate
-    const bufferSize = Math.floor(sampleRate * duration)
-    const buffer = c.createBuffer(1, bufferSize, sampleRate)
-    const data = buffer.getChannelData(0)
-
-    // 白噪声 + 指数衰减
-    for (let i = 0; i < bufferSize; i++) {
-      const t = i / sampleRate
-      const decayFactor = theme === 'normal' ? 0.35 : 0.25
-      const envelope = Math.exp(-t / (duration * decayFactor))
-      data[i] = (Math.random() * 2 - 1) * envelope * 0.6
-    }
-
-    const source = c.createBufferSource()
-    source.buffer = buffer
-    const gain = c.createGain()
-    gain.gain.value = theme === 'normal' ? 0.15 : 0.18
-    source.connect(gain)
-    gain.connect(c.destination)
-
-    // 高频增强 — 更像真实快门
-    const filter = c.createBiquadFilter()
-    filter.type = 'highshelf'
-    filter.frequency.value = 4000
-    filter.gain.value = theme === 'normal' ? 4 : 6
-    gain.connect(filter)
-    filter.connect(c.destination)
-
-    source.start()
-
-    source.onended = () => {
-      try { source.disconnect() } catch { /* noop */ }
-      try { gain.disconnect() } catch { /* noop */ }
-      try { filter.disconnect() } catch { /* noop */ }
-    }
-  } catch { /* 静默降级 */ }
-}
-
 // ─── 语音录制音效 ────────────────────────────────────────────
 
 /**

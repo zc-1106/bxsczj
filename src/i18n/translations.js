@@ -93,7 +93,7 @@ const zh = {
   'error.empty': '请至少输入一种食材',
   'error.emptyRecipes': 'AI 返回了空食谱，试试换一批食材',
   'error.gotIt': '知道啦',
-  'error.apiKey': '视觉识别服务未配置，请联系管理员设置 OPENAI_API_KEY',
+  'error.apiKey': '服务未配置，请联系管理员',
 
   // ── 食谱卡片 ──────────────────────
   'recipe.count': n => `${n} 个食谱新鲜出炉`,
@@ -141,21 +141,7 @@ const zh = {
   'achievement.50': '冰箱之神',
   'achievement.unlocked': '获得勋章',
 
-  // ── 语音 / 拍照 ───────────────────
-  'camera.title': '拍照识别食材',
-  'camera.photo': '拍照',
-  'camera.gallery': '从相册选择',
-  'camera.photoDesc': '直接拍摄食材照片',
-  'camera.galleryDesc': '从图库中选取照片',
-  'camera.recognizing': '正在识别食材...',
-  'camera.recognized': '识别出：',
-  'camera.recognizedLabel': '已识别食材',
-  'camera.notRecognized': '未识别到食材，请试试手动输入吧',
-  'camera.cancelRecognize': '取消识别',
-  'camera.resultFeedback': '已识别并添加到输入框',
-  'camera.retryHint': '未识别到食材，请重试',
-  'camera.apiKeyHint': '视觉识别服务暂不可用，请稍后重试',
-
+  // ── 语音 ───────────────────────────
   'voice.holdHint': '按住录音，松手识别',
   'voice.listeningHint': '录音中，松手停止',
 }
@@ -239,7 +225,7 @@ const en = {
   'error.empty': 'Please enter at least one ingredient',
   'error.emptyRecipes': 'AI returned empty recipes, try different ingredients',
   'error.gotIt': 'Got it',
-  'error.apiKey': 'Visual recognition service not configured, please contact admin to set OPENAI_API_KEY',
+  'error.apiKey': 'Service not configured, please contact admin',
 
   'recipe.count': n => `${n} recipes fresh out of the kitchen!`,
   'recipe.label': 'Recipe',
@@ -280,20 +266,6 @@ const en = {
   'achievement.10': 'Fridge Royal Chef',
   'achievement.50': 'God of Leftovers',
   'achievement.unlocked': 'Badge Unlocked',
-
-  'camera.title': 'Photo Recognition',
-  'camera.photo': 'Take Photo',
-  'camera.gallery': 'Choose from Gallery',
-  'camera.photoDesc': 'Take a photo of ingredients',
-  'camera.galleryDesc': 'Pick an image from gallery',
-  'camera.recognizing': 'Recognizing ingredients...',
-  'camera.recognized': 'Recognized:',
-  'camera.recognizedLabel': 'Ingredients recognized',
-  'camera.notRecognized': 'No ingredients found, try typing manually',
-  'camera.cancelRecognize': 'Cancel',
-  'camera.resultFeedback': 'Recognized and added to input',
-  'camera.retryHint': 'Recognition failed, please try again',
-  'camera.apiKeyHint': 'Visual recognition is temporarily unavailable, please try again later',
 
   'voice.holdHint': 'Hold to record, release to recognize',
   'voice.listeningHint': 'Recording... release to stop',
@@ -378,7 +350,7 @@ const ja = {
   'error.empty': '少なくとも1つの食材を入力してください',
   'error.emptyRecipes': 'AIが空のレシピを返しました。別の食材を試してください',
   'error.gotIt': '了解',
-  'error.apiKey': '視覚認識サービスが設定されていません。管理者にOPENAI_API_KEYの設定を依頼してください',
+  'error.apiKey': 'サービスが設定されていません。管理者に連絡してください',
 
   'recipe.count': n => `${n}件のレシピができました！`,
   'recipe.label': 'レシピ',
@@ -419,20 +391,6 @@ const ja = {
   'achievement.10': '冷蔵庫の達人',
   'achievement.50': '残り物の神',
   'achievement.unlocked': 'バッジ獲得',
-
-  'camera.title': '写真で食材認識',
-  'camera.photo': '撮影',
-  'camera.gallery': 'ギャラリーから選択',
-  'camera.photoDesc': '食材の写真を撮る',
-  'camera.galleryDesc': 'ギャラリーから画像を選ぶ',
-  'camera.recognizing': '食材を認識中...',
-  'camera.recognized': '認識結果：',
-  'camera.recognizedLabel': '認識した食材',
-  'camera.notRecognized': '食材が見つかりませんでした。手動で入力してください',
-  'camera.cancelRecognize': 'キャンセル',
-  'camera.resultFeedback': '認識して入力欄に追加しました',
-  'camera.retryHint': '認識に失敗しました。再試行してください',
-  'camera.apiKeyHint': '視覚認識サービスは一時的に利用できません。しばらくしてからもう一度お試しください',
 
   'voice.holdHint': '長押しで録音、離すと認識',
   'voice.listeningHint': '録音中... 離すと停止',
